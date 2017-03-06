@@ -2,8 +2,9 @@ NAME     := esnctl
 VERSION  := v0.1.0
 REVISION := $(shell git rev-parse --short HEAD)
 
-SRCS    := $(shell find . -type f -name '*.go')
-LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -extldflags \"-static\""
+SRCS     := $(shell find . -type f -name '*.go')
+LDFLAGS  := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\" -extldflags \"-static\""
+NOVENDOR := $(shell go list ./... | grep -v vendor)
 
 DIST_DIRS := find * -type d -exec
 
@@ -16,7 +17,7 @@ bin/$(NAME): $(SRCS)
 ci-test:
 	echo "" > coverage.txt
 	set -e; \
-	for d in `glide novendor`; do \
+	for d in $(NOVENDOR); do \
 		go test -coverprofile=profile.out -covermode=atomic -v $$d; \
 		if [ -f profile.out ]; then \
 			cat profile.out >> coverage.txt; \
@@ -68,4 +69,4 @@ release:
 
 .PHONY: test
 test:
-	go test -cover -v `glide novendor`
+	go test -cover -v $(NOVENDOR)

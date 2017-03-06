@@ -1,10 +1,18 @@
 {
-    "memo": "e0c944d77f6041068605740e394a693ba559995f9316152357cd6e5113fd398f",
+    "memo": "076ba131b02d70b98b8e271e414d1214e1a777dc110269c7a7f616cb5fc64546",
     "projects": [
         {
             "name": "github.com/inconshreveable/mousetrap",
             "branch": "master",
             "revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/pkg/errors",
+            "version": "v0.8.0",
+            "revision": "3866ebc348c54054262feae422da428fe6cf147d",
             "packages": [
                 "."
             ]
@@ -21,6 +29,14 @@
             "name": "github.com/spf13/pflag",
             "branch": "master",
             "revision": "9ff6c6923cfffbcd502984b8e0c80539a94968b7",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "gopkg.in/h2non/gock.v1",
+            "version": "v1.0.4",
+            "revision": "2897ffde93a71060ce86518f1e7317ec8433d2d6",
             "packages": [
                 "."
             ]
