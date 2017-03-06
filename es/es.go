@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// New creates and returns appropriate Elasticsearch client
 func New(clusterURL string) (Client, error) {
 	version, err := DetectVersion(clusterURL)
 	if err != nil {
