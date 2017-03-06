@@ -1,5 +1,5 @@
 {
-    "memo": "076ba131b02d70b98b8e271e414d1214e1a777dc110269c7a7f616cb5fc64546",
+    "memo": "3307d631e625d14a0e8ee28e951f8903c5fd4bd098a8e35557cdbbf8bd1ea0af",
     "projects": [
         {
             "name": "github.com/inconshreveable/mousetrap",
@@ -37,6 +37,14 @@
             "name": "gopkg.in/h2non/gock.v1",
             "version": "v1.0.4",
             "revision": "2897ffde93a71060ce86518f1e7317ec8433d2d6",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "gopkg.in/olivere/elastic.v2",
+            "version": "v2.0.57",
+            "revision": "be79ff0d0a9e360bba99e0a015888d0f414dc7bf",
             "packages": [
                 "."
             ]

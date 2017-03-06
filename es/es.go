@@ -7,8 +7,27 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/dtan4/esnctl/es/v1"
 	"github.com/pkg/errors"
 )
+
+func New(clusterURL string) (*Client, error) {
+	version, err := DetectVersion(clusterURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to detect Elasticsearch version")
+	}
+
+	if version == "1.0.0" {
+		client, err := v1.NewClient(clusterURL)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create Elasticsearch API")
+		}
+
+		return client, nil
+	}
+
+	return nil, errors.Errorf("version %q does not supported", version)
+}
 
 // DetectVersion returns Elasticsearch version of the given endpoint
 func DetectVersion(clusterURL string) (string, error) {
