@@ -24,13 +24,20 @@ func NewClient(clusterURL string) (*Client, error) {
 	var client *elastic.Client
 
 	if u.User == nil {
-		client, err = elastic.NewClient(elastic.SetURL(plainURL), elastic.SetSniff(false))
+		client, err = elastic.NewClient(
+			elastic.SetURL(plainURL),
+			elastic.SetSniff(false),
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}
 	} else {
 		password, _ := u.User.Password()
-		client, err = elastic.NewClient(elastic.SetURL(plainURL), elastic.SetBasicAuth(u.User.Username(), password), elastic.SetSniff(false))
+		client, err = elastic.NewClient(
+			elastic.SetURL(plainURL),
+			elastic.SetBasicAuth(u.User.Username(), password),
+			elastic.SetSniff(false),
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}
