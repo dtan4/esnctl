@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/dtan4/esnctl/es/v1"
+	"github.com/dtan4/esnctl/es/v2"
 	"github.com/pkg/errors"
 )
 
@@ -20,8 +21,16 @@ func New(clusterURL string) (Client, error) {
 
 	digits := strings.Split(version, ".")
 
-	if digits[0] == "1" {
+	switch digits[0] {
+	case "1":
 		client, err := v1.NewClient(clusterURL)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
+		}
+
+		return client, nil
+	case "2":
+		client, err := v2.NewClient(clusterURL)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}

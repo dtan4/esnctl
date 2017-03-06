@@ -1,5 +1,5 @@
 {
-    "memo": "3307d631e625d14a0e8ee28e951f8903c5fd4bd098a8e35557cdbbf8bd1ea0af",
+    "memo": "35c25b25a287d2cdda546a226eccad002dc7caf8ad148c2d0c9b3c4c98ea5f23",
     "projects": [
         {
             "name": "github.com/inconshreveable/mousetrap",
@@ -34,6 +34,15 @@
             ]
         },
         {
+            "name": "golang.org/x/net",
+            "branch": "release-branch.go1.6",
+            "revision": "62685c2d7ca23c807425dca88b11a3e2323dab41",
+            "packages": [
+                "context",
+                "context/ctxhttp"
+            ]
+        },
+        {
             "name": "gopkg.in/h2non/gock.v1",
             "version": "v1.0.4",
             "revision": "2897ffde93a71060ce86518f1e7317ec8433d2d6",
@@ -45,6 +54,14 @@
             "name": "gopkg.in/olivere/elastic.v2",
             "version": "v2.0.57",
             "revision": "be79ff0d0a9e360bba99e0a015888d0f414dc7bf",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "gopkg.in/olivere/elastic.v3",
+            "version": "v3.0.66",
+            "revision": "90486b697c7b506d7d949b8ba0c1a7b849db5db6",
             "packages": [
                 "."
             ]
