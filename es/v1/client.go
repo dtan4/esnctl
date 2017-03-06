@@ -1,6 +1,9 @@
 package v1
 
 import (
+	"fmt"
+	"net/url"
+
 	"github.com/pkg/errors"
 	"gopkg.in/olivere/elastic.v2"
 )
@@ -12,9 +15,25 @@ type Client struct {
 
 // NewClient creates new Client object
 func NewClient(clusterURL string) (*Client, error) {
-	client, err := elastic.NewClient(elastic.SetURL(clusterURL))
+	u, err := url.Parse(clusterURL)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
+		return nil, errors.Wrap(err, "failed to parse cluster URL")
+	}
+	plainURL := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+
+	var client *elastic.Client
+
+	if u.User == nil {
+		client, err = elastic.NewClient(elastic.SetURL(plainURL), elastic.SetSniff(false))
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
+		}
+	} else {
+		password, _ := u.User.Password()
+		client, err = elastic.NewClient(elastic.SetURL(plainURL), elastic.SetBasicAuth(u.User.Username(), password), elastic.SetSniff(false))
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
+		}
 	}
 
 	return &Client{

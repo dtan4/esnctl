@@ -6,21 +6,24 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/dtan4/esnctl/es/v1"
 	"github.com/pkg/errors"
 )
 
-func New(clusterURL string) (*Client, error) {
+func New(clusterURL string) (Client, error) {
 	version, err := DetectVersion(clusterURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to detect Elasticsearch version")
 	}
 
-	if version == "1.0.0" {
+	digits := strings.Split(version, ".")
+
+	if digits[0] == "1" {
 		client, err := v1.NewClient(clusterURL)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create Elasticsearch API")
+			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}
 
 		return client, nil
