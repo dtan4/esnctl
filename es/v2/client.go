@@ -54,6 +54,27 @@ func NewClient(clusterURL string) (*Client, error) {
 }
 
 // EnableReallocation enables shard reallocation
+// Modifies cluster.routing.allocation.enable to "none"
+// https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
+func (c *Client) DisableReallocation() error {
+	httpClient := &http.Client{}
+	endpoint := path.Join(c.clusterEndpoint, "_cluster", "settings")
+
+	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"none"}}`))
+	if err != nil {
+		return errors.Wrap(err, "failed to make DisableReallocation request")
+	}
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute DisableReallocation request")
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+// EnableReallocation enables shard reallocation
 // Modifies cluster.routing.allocation.enable to "all"
 // https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
 func (c *Client) EnableReallocation() error {
