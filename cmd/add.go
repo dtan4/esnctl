@@ -1,12 +1,19 @@
 package cmd
 
 import (
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/dtan4/esnctl/aws"
 	"github.com/dtan4/esnctl/es"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+)
+
+const (
+	addMaxRetry     = 120
+	addSleepSeconds = 5
 )
 
 // addCmd represents the add command
@@ -40,9 +47,32 @@ func doAdd(cmd *cobra.Command, args []string) error {
 	}
 	defer client.EnableReallocation()
 
-	_, err = aws.AutoScaling.IncreaseInstances(autoScalingGroup, delta)
+	desiredCapacity, err := aws.AutoScaling.IncreaseInstances(autoScalingGroup, delta)
 	if err != nil {
 		return errors.Wrap(err, "failed to increase instance")
+	}
+
+	retryCount := 0
+
+	for {
+		nodes, err := client.ListNodes()
+		if err != nil {
+			return errors.Wrap(err, "failed to list nodes")
+		}
+
+		if len(nodes) == desiredCapacity {
+			fmt.Print("\n")
+			break
+		}
+
+		fmt.Print(".")
+
+		if retryCount == addMaxRetry {
+			return errors.New("timed out: added nodes do not join to Elasticsearch cluster")
+		}
+
+		retryCount++
+		time.Sleep(addSleepSeconds)
 	}
 
 	return nil
