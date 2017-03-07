@@ -36,7 +36,7 @@ func TestDetachInstance(t *testing.T) {
 	}
 }
 
-func TestListTargetInstances(t *testing.T) {
+func TestListTargetStatuses(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -49,10 +49,16 @@ func TestListTargetInstances(t *testing.T) {
 				Target: &elbv2.TargetDescription{
 					Id: aws.String("i-1234abcd"),
 				},
+				TargetHealth: &elbv2.TargetHealth{
+					State: aws.String("healthy"),
+				},
 			},
 			&elbv2.TargetHealthDescription{
 				Target: &elbv2.TargetDescription{
 					Id: aws.String("i-5678efab"),
+				},
+				TargetHealth: &elbv2.TargetHealth{
+					State: aws.String("draining"),
 				},
 			},
 		},
@@ -63,12 +69,12 @@ func TestListTargetInstances(t *testing.T) {
 	}
 
 	targetGroupARN := "arn:aws:elasticloadbalancing:ap-northeast-1:012345678901:targetgroup/elasticsearch/0123abcd5678efab"
-	expected := []string{
-		"i-1234abcd",
-		"i-5678efab",
+	expected := map[string]string{
+		"i-1234abcd": "healthy",
+		"i-5678efab": "draining",
 	}
 
-	got, err := client.ListTargetInstances(targetGroupARN)
+	got, err := client.ListTargetStatuses(targetGroupARN)
 	if err != nil {
 		t.Errorf("error should not be raised: %s", err)
 	}

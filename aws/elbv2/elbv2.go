@@ -36,20 +36,20 @@ func (c *Client) DetachInstance(targetGroupARN, instanceID string) error {
 	return nil
 }
 
-// ListTargetInstances lists instances attached to the given target group
-func (c *Client) ListTargetInstances(targetGroupARN string) ([]string, error) {
+// ListTargetStatuses lists instance statuses attached to the given target group
+func (c *Client) ListTargetStatuses(targetGroupARN string) (map[string]string, error) {
 	resp, err := c.api.DescribeTargetHealth(&elbv2.DescribeTargetHealthInput{
 		TargetGroupArn: aws.String(targetGroupARN),
 	})
 	if err != nil {
-		return []string{}, errors.Wrap(err, "failed to list target instances")
+		return map[string]string{}, errors.Wrap(err, "failed to list target instances")
 	}
 
-	instanceIDs := []string{}
+	statuses := map[string]string{}
 
 	for _, health := range resp.TargetHealthDescriptions {
-		instanceIDs = append(instanceIDs, aws.StringValue(health.Target.Id))
+		statuses[aws.StringValue(health.Target.Id)] = aws.StringValue(health.TargetHealth.State)
 	}
 
-	return instanceIDs, nil
+	return statuses, nil
 }
