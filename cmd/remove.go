@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dtan4/esnctl/aws"
 	"github.com/dtan4/esnctl/es"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -45,7 +46,19 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}
 
-	// TODO: remove instance from ELB
+	instanceID, err := aws.EC2.RetrieveInstanceIDFromPrivateDNS(removeOpts.nodeName)
+	if err != nil {
+		return errors.Wrap(err, "failed to retrieve instance ID")
+	}
+
+	targetGroupARN, err := aws.AutoScaling.RetrieveTargetGroup(removeOpts.autoScalingGroup)
+	if err != nil {
+		return errors.Wrap(err, "failed to retrieve target group")
+	}
+
+	if err := aws.ELBv2.DetachInstance(targetGroupARN, instanceID); err != nil {
+		return errors.Wrap(err, "failed to detach instance from target group")
+	}
 
 	// TODO: wait for connection draining
 
@@ -80,7 +93,9 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to shutdown node")
 	}
 
-	// TODO: detach instance from ASG
+	if err := aws.AutoScaling.DetachInstance(removeOpts.autoScalingGroup, instanceID); err != nil {
+		return errors.Wrap(err, "failed to detach instance from AutoScaling Group")
+	}
 
 	return nil
 }
@@ -88,7 +103,7 @@ func doRemove(cmd *cobra.Command, args []string) error {
 func init() {
 	RootCmd.AddCommand(removeCmd)
 
-	addCmd.Flags().StringVar(&removeOpts.autoScalingGroup, "group", "", "AutoScaling Group")
-	addCmd.Flags().StringVar(&removeOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
-	addCmd.Flags().StringVar(&removeOpts.nodeName, "node-name", "", "Elasticsearch node name to remove")
+	removeCmd.Flags().StringVar(&removeOpts.autoScalingGroup, "group", "", "AutoScaling Group")
+	removeCmd.Flags().StringVar(&removeOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
+	removeCmd.Flags().StringVar(&removeOpts.nodeName, "node-name", "", "Elasticsearch node name to remove")
 }
