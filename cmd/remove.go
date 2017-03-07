@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	maxRetry     = 60
-	sleepSeconds = 5
+	removeMaxRetry     = 60
+	removeSleepSeconds = 5
 )
 
 // removeCmd represents the remove command
@@ -56,12 +56,12 @@ func doRemove(cmd *cobra.Command, args []string) error {
 
 		fmt.Print(".")
 
-		if retryCount == maxRetry {
+		if retryCount == removeMaxRetry {
 			return errors.New("shards did not escaped from the given node")
 		}
 
 		retryCount++
-		time.Sleep(sleepSeconds)
+		time.Sleep(removeSleepSeconds)
 	}
 
 	if err := client.Shutdown(nodeName); err != nil {
