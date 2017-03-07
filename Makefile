@@ -46,7 +46,7 @@ ifeq ($(shell command -v dep 2> /dev/null),)
 endif
 
 .PHONY: deps
-deps: dep
+deps: dep mockgen
 	dep ensure
 
 .PHONY: dist
@@ -61,6 +61,12 @@ dist:
 .PHONY: install
 install:
 	go install $(LDFLAGS)
+
+.PHONY: mockgen
+mockgen:
+ifeq ($(shell command -v mockgen 2> /dev/null),)
+	go get -u -v github.com/golang/mock/mockgen
+endif
 
 .PHONY: release
 release:
