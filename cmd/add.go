@@ -20,7 +20,7 @@ const (
 var addCmd = &cobra.Command{
 	SilenceErrors: true,
 	SilenceUsage:  true,
-	Use:           "add <cluster URL> <AutoScaling Group> <Number to increase>",
+	Use:           "add <cluster URL> <AutoScaling Group> <Number to increase (+N)>",
 	Short:         "Add Elasticsearch node",
 	RunE:          doAdd,
 }
