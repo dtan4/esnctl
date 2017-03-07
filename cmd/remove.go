@@ -1,9 +1,17 @@
 package cmd
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/dtan4/esnctl/es"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+)
+
+const (
+	maxRetry     = 60
+	sleepSeconds = 5
 )
 
 // removeCmd represents the remove command
@@ -33,7 +41,28 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to exclude node from allocation group")
 	}
 
-	// TODO: wait all shard are escaped from the given node
+	retryCount := 0
+
+	for {
+		shards, err := client.ListShardsOnNode(nodeName)
+		if err != nil {
+			return errors.Wrap(err, "failed to list shards on the given node")
+		}
+
+		if len(shards) == 0 {
+			fmt.Print("\n")
+			break
+		}
+
+		fmt.Print(".")
+
+		if retryCount == maxRetry {
+			return errors.New("shards did not escaped from the given node")
+		}
+
+		retryCount++
+		time.Sleep(sleepSeconds)
+	}
 
 	if err := client.Shutdown(nodeName); err != nil {
 		return errors.Wrap(err, "failed to shutdown node")
