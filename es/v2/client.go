@@ -2,7 +2,10 @@ package v2
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/pkg/errors"
 	"gopkg.in/olivere/elastic.v3"
@@ -48,6 +51,68 @@ func NewClient(clusterURL string) (*Client, error) {
 		client:          client,
 		clusterEndpoint: clusterEndpoint,
 	}, nil
+}
+
+// DisableReallocation enables shard reallocation
+// Modifies cluster.routing.allocation.enable to "none"
+// https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
+func (c *Client) DisableReallocation() error {
+	httpClient := &http.Client{}
+	endpoint := c.clusterEndpoint + "/_cluster/settings"
+
+	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"none"}}`))
+	if err != nil {
+		return errors.Wrap(err, "failed to make DisableReallocation request")
+	}
+	defer req.Body.Close()
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute DisableReallocation request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute DisableReallocation request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
+	return nil
+}
+
+// EnableReallocation enables shard reallocation
+// Modifies cluster.routing.allocation.enable to "all"
+// https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
+func (c *Client) EnableReallocation() error {
+	httpClient := &http.Client{}
+	endpoint := c.clusterEndpoint + "/_cluster/settings"
+
+	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"all"}}`))
+	if err != nil {
+		return errors.Wrap(err, "failed to make EnableReallocation request")
+	}
+	defer req.Body.Close()
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute EnableReallocation request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute DisableReallocation request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
+	return nil
 }
 
 // ListNodes returns the list of node names
