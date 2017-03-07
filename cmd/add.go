@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/dtan4/esnctl/aws"
@@ -20,24 +19,31 @@ const (
 var addCmd = &cobra.Command{
 	SilenceErrors: true,
 	SilenceUsage:  true,
-	Use:           "add <cluster URL> <AutoScaling Group> <Number to increase (+N)>",
+	Use:           "add",
 	Short:         "Add Elasticsearch node",
 	RunE:          doAdd,
 }
 
+var addOpts = struct {
+	autoScalingGroup string
+	clusterURL       string
+	delta            int
+}{}
+
 func doAdd(cmd *cobra.Command, args []string) error {
-	if len(args) != 3 {
-		return errors.New("cluster URL, AutoScaling Group and the number to increase must be specified")
-	}
-	clusterURL := args[0]
-	autoScalingGroup := args[1]
-
-	delta, err := strconv.Atoi(args[2])
-	if err != nil {
-		return errors.Wrapf(err, "invalid number to increase %q", args[2])
+	if addOpts.clusterURL == "" {
+		return errors.New("Elasticsearch cluster URL must be specified")
 	}
 
-	client, err := es.New(clusterURL)
+	if addOpts.autoScalingGroup == "" {
+		return errors.New("AutoScaling Group must be specified")
+	}
+
+	if addOpts.delta < 1 {
+		return errors.New("number to add instances must be greater than 0")
+	}
+
+	client, err := es.New(addOpts.clusterURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}
@@ -48,9 +54,9 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to disable reallocation")
 	}
 
-	fmt.Printf("===> Adding %d instances...\n", delta)
+	fmt.Printf("===> Launching %d instances on %s...\n", addOpts.delta, addOpts.autoScalingGroup)
 
-	desiredCapacity, err := aws.AutoScaling.IncreaseInstances(autoScalingGroup, delta)
+	desiredCapacity, err := aws.AutoScaling.IncreaseInstances(addOpts.autoScalingGroup, addOpts.delta)
 	if err != nil {
 		return errors.Wrap(err, "failed to increase instance")
 	}
@@ -91,4 +97,8 @@ func doAdd(cmd *cobra.Command, args []string) error {
 
 func init() {
 	RootCmd.AddCommand(addCmd)
+
+	addCmd.Flags().StringVar(&addOpts.autoScalingGroup, "group", "", "AutoScaling Group")
+	addCmd.Flags().StringVar(&addOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
+	addCmd.Flags().IntVarP(&addOpts.delta, "number", "n", 0, "Number to add instances")
 }
