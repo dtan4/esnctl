@@ -23,28 +23,24 @@ func NewClient(clusterURL string) (*Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse cluster URL")
 	}
-	clusterEndpoint := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+
+	var clusterEndpoint string
+
+	if u.User == nil {
+		clusterEndpoint = fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+	} else {
+		password, _ := u.User.Password()
+		clusterEndpoint = fmt.Sprintf("%s://%s:%s@%s", u.Scheme, u.User.Username(), password, u.Host)
+	}
 
 	var client *elastic.Client
 
-	if u.User == nil {
-		client, err = elastic.NewClient(
-			elastic.SetURL(clusterEndpoint),
-			elastic.SetSniff(false),
-		)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
-		}
-	} else {
-		password, _ := u.User.Password()
-		client, err = elastic.NewClient(
-			elastic.SetURL(clusterEndpoint),
-			elastic.SetBasicAuth(u.User.Username(), password),
-			elastic.SetSniff(false),
-		)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
-		}
+	client, err = elastic.NewClient(
+		elastic.SetURL(clusterEndpoint),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 	}
 
 	return &Client{
