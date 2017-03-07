@@ -19,6 +19,7 @@ func TestDetachInstance(t *testing.T) {
 		InstanceIds: []*string{
 			aws.String("i-1234abcd"),
 		},
+		ShouldDecrementDesiredCapacity: aws.Bool(true),
 	}).Return(&autoscaling.DetachInstancesOutput{}, nil)
 
 	client := &Client{

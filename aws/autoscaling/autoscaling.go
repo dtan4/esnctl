@@ -26,6 +26,7 @@ func (c *Client) DetachInstance(groupName, instanceID string) error {
 		InstanceIds: []*string{
 			aws.String(instanceID),
 		},
+		ShouldDecrementDesiredCapacity: aws.Bool(true),
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to detach instance")
