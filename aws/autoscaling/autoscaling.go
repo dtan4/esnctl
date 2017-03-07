@@ -48,3 +48,19 @@ func (c *Client) IncreaseInstances(groupName string, delta int) (int, error) {
 
 	return int(targetDesiredCapacity), nil
 }
+
+// RetrieveTargetGroup retrieves target group ARN attached to the given ASG
+func (c *Client) RetrieveTargetGroup(groupName string) (string, error) {
+	resp, err := c.api.DescribeLoadBalancerTargetGroups(&autoscaling.DescribeLoadBalancerTargetGroupsInput{
+		AutoScalingGroupName: aws.String(groupName),
+	})
+	if err != nil {
+		return "", errors.Wrap(err, "failed to retirve attached target group")
+	}
+
+	if len(resp.LoadBalancerTargetGroups) == 0 {
+		return "", errors.Errorf("no target group is attached to %q", groupName)
+	}
+
+	return aws.StringValue(resp.LoadBalancerTargetGroups[0].LoadBalancerTargetGroupARN), nil
+}
