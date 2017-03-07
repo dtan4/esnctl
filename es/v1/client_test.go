@@ -54,3 +54,20 @@ func TestExcludeNodeFromAllocation(t *testing.T) {
 		t.Errorf("error should not be raised: %s", err)
 	}
 }
+
+func TestShutdown(t *testing.T) {
+	defer gock.Off()
+
+	client := &Client{
+		client:          nil,
+		clusterEndpoint: testClusterEndpoint,
+	}
+
+	gock.New(testClusterEndpoint).Post("/_cluster/nodes/ip-10-0-1-23.ap-northeast-1.compute.internal/_shutdown").Reply(200)
+
+	nodeName := "ip-10-0-1-23.ap-northeast-1.compute.internal"
+
+	if err := client.Shutdown(nodeName); err != nil {
+		t.Errorf("error should not be raised: %s", err)
+	}
+}

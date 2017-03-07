@@ -6,4 +6,5 @@ type Client interface {
 	EnableReallocation() error
 	ExcludeNodeFromAllocation(nodeName string) error
 	ListNodes() ([]string, error)
+	Shutdown(nodeName string) error
 }

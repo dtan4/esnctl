@@ -161,3 +161,31 @@ func (c *Client) ListNodes() ([]string, error) {
 
 	return nodes, nil
 }
+
+// Shutdown shutdowns the given node
+func (c *Client) Shutdown(nodeName string) error {
+	httpClient := &http.Client{}
+	endpoint := c.clusterEndpoint + "/_cluster/nodes/" + nodeName + "/_shutdown"
+
+	req, err := http.NewRequest("POST", endpoint, nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to make Shutdown request")
+	}
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute Shutdown request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute Shutdown request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
+	return nil
+}

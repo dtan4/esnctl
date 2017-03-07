@@ -161,3 +161,8 @@ func (c *Client) ListNodes() ([]string, error) {
 
 	return nodes, nil
 }
+
+// Shutdown does nothing, because Elasticsearch 2.x does not have shutdown API
+func (c *Client) Shutdown(nodeName string) error {
+	return nil
+}
