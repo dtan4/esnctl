@@ -115,6 +115,37 @@ func (c *Client) EnableReallocation() error {
 	return nil
 }
 
+// ExcludeNodeFromAllocation excludes the given node from shard allocation group
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/allocation-filtering.html
+func (c *Client) ExcludeNodeFromAllocation(nodeName string) error {
+	httpClient := &http.Client{}
+	endpoint := c.clusterEndpoint + "/_cluster/settings"
+	reqBody := fmt.Sprintf(`{"transient":{"cluster.routing.allocation.exclude._name":"%s"}}`, nodeName)
+
+	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(reqBody))
+	if err != nil {
+		return errors.Wrap(err, "failed to make ExcludeNodeFromAllocation request")
+	}
+	defer req.Body.Close()
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute ExcludeNodeFromAllocation request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute ExcludeNodeFromAllocation request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
+	return nil
+}
+
 // ListNodes returns the list of node names
 func (c *Client) ListNodes() ([]string, error) {
 	nodesInfo, err := c.client.NodesInfo().Do()
@@ -129,4 +160,47 @@ func (c *Client) ListNodes() ([]string, error) {
 	}
 
 	return nodes, nil
+}
+
+// ListShards returns the list of shards on the given node
+func (c *Client) ListShardsOnNode(nodeName string) ([]string, error) {
+	httpClient := &http.Client{}
+	endpoint := c.clusterEndpoint + "/_cat/shards/"
+
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "failed to make cat-shards request")
+	}
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "failed to execute Shutdown request")
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "failed to read response body")
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return []string{}, errors.Errorf("failed to execute Shutdown request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
+	lines := strings.Split(string(body), "\n")
+
+	shardsOnNode := []string{}
+
+	for _, line := range lines {
+		if strings.HasSuffix(line, nodeName) {
+			shardsOnNode = append(shardsOnNode, line)
+		}
+	}
+
+	return shardsOnNode, nil
+}
+
+// Shutdown does nothing, because Elasticsearch 2.x does not have shutdown API
+func (c *Client) Shutdown(nodeName string) error {
+	return nil
 }
