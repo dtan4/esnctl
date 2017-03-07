@@ -46,15 +46,21 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}
 
+	fmt.Println("===> Retrieving target instance ID...")
+
 	instanceID, err := aws.EC2.RetrieveInstanceIDFromPrivateDNS(removeOpts.nodeName)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve instance ID")
 	}
 
+	fmt.Println("===> Retrieving target group...")
+
 	targetGroupARN, err := aws.AutoScaling.RetrieveTargetGroup(removeOpts.autoScalingGroup)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve target group")
 	}
+
+	fmt.Println("===> Detaching instance from target group...")
 
 	if err := aws.ELBv2.DetachInstance(targetGroupARN, instanceID); err != nil {
 		return errors.Wrap(err, "failed to detach instance from target group")
@@ -62,9 +68,13 @@ func doRemove(cmd *cobra.Command, args []string) error {
 
 	// TODO: wait for connection draining
 
+	fmt.Println("===> Excluding target node from shard allocation group...")
+
 	if err := client.ExcludeNodeFromAllocation(removeOpts.nodeName); err != nil {
 		return errors.Wrap(err, "failed to exclude node from allocation group")
 	}
+
+	fmt.Println("===> Waiting for shards escape from target node...")
 
 	retryCount := 0
 
@@ -89,9 +99,13 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		time.Sleep(removeSleepSeconds * time.Second)
 	}
 
+	fmt.Println("===> Shutting down target node...")
+
 	if err := client.Shutdown(removeOpts.nodeName); err != nil {
 		return errors.Wrap(err, "failed to shutdown node")
 	}
+
+	fmt.Println("===> Detaching target instance...")
 
 	if err := aws.AutoScaling.DetachInstance(removeOpts.autoScalingGroup, instanceID); err != nil {
 		return errors.Wrap(err, "failed to detach instance from AutoScaling Group")
