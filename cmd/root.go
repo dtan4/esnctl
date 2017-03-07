@@ -15,7 +15,7 @@ var RootCmd = &cobra.Command{
 	Short: "A brief description of your application",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := aws.Initialize(rootOpts.region); err != nil {
-			return errors.Wrap(err, "Failed to initialize AWS API clients.")
+			return errors.Wrap(err, "failed to initialize AWS service clients")
 		}
 
 		return nil
