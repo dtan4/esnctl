@@ -66,7 +66,39 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to detach instance from target group")
 	}
 
-	// TODO: wait for connection draining
+	fmt.Println("===> Waiting for connection draining...")
+
+	retryCount := 0
+
+	for {
+		instances, err := aws.ELBv2.ListTargetInstances(targetGroupARN)
+		if err != nil {
+			return errors.Wrap(err, "failed to list instances attached to target group")
+		}
+
+		found := false
+
+		for _, instance := range instances {
+			if instance == instanceID {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			fmt.Print("\n")
+			break
+		}
+
+		fmt.Print(".")
+
+		if retryCount == removeMaxRetry {
+			return errors.New("timed out: instance still remains on target group")
+		}
+
+		retryCount++
+		time.Sleep(removeSleepSeconds * time.Second)
+	}
 
 	fmt.Println("===> Excluding target node from shard allocation group...")
 
@@ -76,7 +108,7 @@ func doRemove(cmd *cobra.Command, args []string) error {
 
 	fmt.Println("===> Waiting for shards escape from target node...")
 
-	retryCount := 0
+	retryCount = 0
 
 	for {
 		shards, err := client.ListShardsOnNode(removeOpts.nodeName)
@@ -92,7 +124,7 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		fmt.Print(".")
 
 		if retryCount == removeMaxRetry {
-			return errors.New("shards did not escaped from the given node")
+			return errors.New("timed out: shards do not escaped from the given node")
 		}
 
 		retryCount++
