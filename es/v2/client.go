@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -71,6 +72,15 @@ func (c *Client) DisableReallocation() error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute DisableReallocation request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
 	return nil
 }
 
@@ -92,6 +102,15 @@ func (c *Client) EnableReallocation() error {
 		return errors.Wrap(err, "failed to execute EnableReallocation request")
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute DisableReallocation request. code: %d, body: %s", resp.StatusCode, body)
+	}
 
 	return nil
 }
