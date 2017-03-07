@@ -55,6 +55,36 @@ func TestExcludeNodeFromAllocation(t *testing.T) {
 	}
 }
 
+func TestListShardsOnNode(t *testing.T) {
+	defer gock.Off()
+
+	client := &Client{
+		client:          nil,
+		clusterEndpoint: testClusterEndpoint,
+	}
+
+	gock.New(testClusterEndpoint).Get("/_cat/shards").Reply(200).BodyString(`wiki1 0 p STARTED 3014 31.1mb 192.168.56.10 ip-10-0-1-23.ap-northeast-1.compute.internal
+wiki1 1 p STARTED 3013 29.6mb 192.168.56.30 Frankie Raye
+wiki1 2 p STARTED 3973 38.1mb 192.168.56.20 Commander Kraken`)
+
+	nodeName := "ip-10-0-1-23.ap-northeast-1.compute.internal"
+
+	shards, err := client.ListShardsOnNode(nodeName)
+	if err != nil {
+		t.Errorf("error should not be raised: %s", err)
+	}
+
+	if len(shards) != 1 {
+		t.Errorf("number of shards does not match. expected: 1, got: %d", len(shards))
+	}
+
+	expected := "wiki1 0 p STARTED 3014 31.1mb 192.168.56.10 ip-10-0-1-23.ap-northeast-1.compute.internal"
+
+	if shards[0] != expected {
+		t.Errorf("shard does not match. expected: %q, got: %q", expected, shards[0])
+	}
+}
+
 func TestShutdown(t *testing.T) {
 	defer gock.Off()
 
