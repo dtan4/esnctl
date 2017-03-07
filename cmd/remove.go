@@ -61,7 +61,7 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		}
 
 		retryCount++
-		time.Sleep(removeSleepSeconds)
+		time.Sleep(removeSleepSeconds * time.Second)
 	}
 
 	if err := client.Shutdown(nodeName); err != nil {
