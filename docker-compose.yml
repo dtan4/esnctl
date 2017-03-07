@@ -1,0 +1,14 @@
+version: '2'
+services:
+  es-v1:
+    image: elasticsearch:1.7-alpine
+    ports:
+      - 9201:9200
+  es-v2:
+    image: elasticsearch:2.4-alpine
+    ports:
+      - 9202:9200
+  es-v5:
+    image: elasticsearch:5.2-alpine
+    ports:
+      - 9205:9200
