@@ -45,7 +45,6 @@ func doAdd(cmd *cobra.Command, args []string) error {
 	if err := client.DisableReallocation(); err != nil {
 		return errors.Wrap(err, "failed to disable reallocation")
 	}
-	defer client.EnableReallocation()
 
 	desiredCapacity, err := aws.AutoScaling.IncreaseInstances(autoScalingGroup, delta)
 	if err != nil {
@@ -73,6 +72,10 @@ func doAdd(cmd *cobra.Command, args []string) error {
 
 		retryCount++
 		time.Sleep(addSleepSeconds)
+	}
+
+	if err := client.EnableReallocation(); err != nil {
+		return errors.Wrap(err, "failed to enable reallocation")
 	}
 
 	return nil
