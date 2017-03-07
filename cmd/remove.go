@@ -1,41 +1,49 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
-//
-
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/dtan4/esnctl/es"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Remove node from Elasticsearch cluster",
+	RunE:  doRemove,
+}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("remove called")
-	},
+func doRemove(cmd *cobra.Command, args []string) error {
+	if len(args) != 2 {
+		return errors.New("cluster URL and node name must be specified")
+	}
+	clusterURL := args[0]
+	nodeName := args[1]
+
+	client, err := es.New(clusterURL)
+	if err != nil {
+		return errors.Wrap(err, "failed to create Elasitcsearch API client")
+	}
+
+	// TODO: remove instance from ELB
+
+	// TODO: wait for connection draining
+
+	if err := client.ExcludeNodeFromAllocation(nodeName); err != nil {
+		return errors.Wrap(err, "failed to exclude node from allocation group")
+	}
+
+	// TODO: wait all shard are escaped from the given node
+
+	if err := client.Shutdown(nodeName); err != nil {
+		return errors.Wrap(err, "failed to shutdown node")
+	}
+
+	// TODO: detach instance from ASG
+
+	return nil
 }
 
 func init() {
 	RootCmd.AddCommand(removeCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// removeCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// removeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 }
