@@ -38,7 +38,14 @@ func TestIncreaseInstances(t *testing.T) {
 	groupName := "elasticsearch"
 	delta := 2
 
-	if err := client.IncreaseInstances(groupName, delta); err != nil {
+	got, err := client.IncreaseInstances(groupName, delta)
+	if err != nil {
 		t.Errorf("error should not be raised: %s", err)
+	}
+
+	expected := 5
+
+	if got != expected {
+		t.Errorf("desired capacity does not match. expected: %d, got: %d", expected, got)
 	}
 }

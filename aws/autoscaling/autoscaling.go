@@ -20,18 +20,18 @@ func New(api autoscalingiface.AutoScalingAPI) *Client {
 }
 
 // IncreaseInstances increases the number of instance
-func (c *Client) IncreaseInstances(groupName string, delta int) error {
+func (c *Client) IncreaseInstances(groupName string, delta int) (int, error) {
 	resp, err := c.api.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []*string{
 			aws.String(groupName),
 		},
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to get AutoScaling Groups")
+		return -1, errors.Wrap(err, "failed to get AutoScaling Groups")
 	}
 
 	if len(resp.AutoScalingGroups) == 0 {
-		return errors.Errorf("AutoScaling Groups %q does not exist", groupName)
+		return -1, errors.Errorf("AutoScaling Groups %q does not exist", groupName)
 	}
 	asg := resp.AutoScalingGroups[0]
 
@@ -43,8 +43,8 @@ func (c *Client) IncreaseInstances(groupName string, delta int) error {
 		DesiredCapacity:      aws.Int64(targetDesiredCapacity),
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to increase desired capacity")
+		return -1, errors.Wrap(err, "failed to increase desired capacity")
 	}
 
-	return nil
+	return int(targetDesiredCapacity), nil
 }
