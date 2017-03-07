@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -58,12 +57,13 @@ func NewClient(clusterURL string) (*Client, error) {
 // https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
 func (c *Client) DisableReallocation() error {
 	httpClient := &http.Client{}
-	endpoint := path.Join(c.clusterEndpoint, "_cluster", "settings")
+	endpoint := c.clusterEndpoint + "/_cluster/settings"
 
 	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"none"}}`))
 	if err != nil {
 		return errors.Wrap(err, "failed to make DisableReallocation request")
 	}
+	defer req.Body.Close()
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -79,12 +79,13 @@ func (c *Client) DisableReallocation() error {
 // https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
 func (c *Client) EnableReallocation() error {
 	httpClient := &http.Client{}
-	endpoint := path.Join(c.clusterEndpoint, "_cluster", "settings")
+	endpoint := c.clusterEndpoint + "/_cluster/settings"
 
 	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"all"}}`))
 	if err != nil {
 		return errors.Wrap(err, "failed to make EnableReallocation request")
 	}
+	defer req.Body.Close()
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
