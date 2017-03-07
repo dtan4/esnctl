@@ -22,3 +22,18 @@ func TestDisableReallocation(t *testing.T) {
 		t.Errorf("error should not be raised: %s", err)
 	}
 }
+
+func TestEnableReallocation(t *testing.T) {
+	defer gock.Off()
+
+	client := &Client{
+		client:          nil,
+		clusterEndpoint: testClusterEndpoint,
+	}
+
+	gock.New(testClusterEndpoint).Put("/_cluster/settings").BodyString(`{"transient":{"cluster.routing.allocation.enable":"all"}}`).Reply(200)
+
+	if err := client.EnableReallocation(); err != nil {
+		t.Errorf("error should not be raised: %s", err)
+	}
+}
