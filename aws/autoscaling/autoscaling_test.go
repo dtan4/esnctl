@@ -9,6 +9,30 @@ import (
 	"github.com/golang/mock/gomock"
 )
 
+func TestDetachInstance(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	api := mock.NewMockAutoScalingAPI(ctrl)
+	api.EXPECT().DetachInstances(&autoscaling.DetachInstancesInput{
+		AutoScalingGroupName: aws.String("elasticsearch"),
+		InstanceIds: []*string{
+			aws.String("i-1234abcd"),
+		},
+	}).Return(&autoscaling.DetachInstancesOutput{}, nil)
+
+	client := &Client{
+		api: api,
+	}
+
+	groupName := "elasticsearch"
+	instanceID := "i-1234abcd"
+
+	if err := client.DetachInstance(groupName, instanceID); err != nil {
+		t.Errorf("error should not be raised: %s", err)
+	}
+}
+
 func TestIncreaseInstances(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

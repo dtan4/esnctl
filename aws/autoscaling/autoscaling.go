@@ -19,6 +19,21 @@ func New(api autoscalingiface.AutoScalingAPI) *Client {
 	}
 }
 
+// DetachInstance detaches instance from the given ASG
+func (c *Client) DetachInstance(groupName, instanceID string) error {
+	_, err := c.api.DetachInstances(&autoscaling.DetachInstancesInput{
+		AutoScalingGroupName: aws.String(groupName),
+		InstanceIds: []*string{
+			aws.String(instanceID),
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to detach instance")
+	}
+
+	return nil
+}
+
 // IncreaseInstances increases the number of instance
 func (c *Client) IncreaseInstances(groupName string, delta int) (int, error) {
 	resp, err := c.api.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
