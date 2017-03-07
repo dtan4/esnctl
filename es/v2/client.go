@@ -115,6 +115,37 @@ func (c *Client) EnableReallocation() error {
 	return nil
 }
 
+// ExcludeNodeFromAllocation excludes the given node from shard allocation group
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/allocation-filtering.html
+func (c *Client) ExcludeNodeFromAllocation(nodeName string) error {
+	httpClient := &http.Client{}
+	endpoint := c.clusterEndpoint + "/_cluster/settings"
+	reqBody := fmt.Sprintf(`{"transient":{"cluster.routing.allocation.exclude._name":"%s"}}`, nodeName)
+
+	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(reqBody))
+	if err != nil {
+		return errors.Wrap(err, "failed to make ExcludeNodeFromAllocation request")
+	}
+	defer req.Body.Close()
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute ExcludeNodeFromAllocation request")
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return errors.Wrap(err, "failed to read response body")
+		}
+
+		return errors.Errorf("failed to execute ExcludeNodeFromAllocation request. code: %d, body: %s", resp.StatusCode, body)
+	}
+
+	return nil
+}
+
 // ListNodes returns the list of node names
 func (c *Client) ListNodes() ([]string, error) {
 	nodesInfo, err := c.client.NodesInfo().Do()
