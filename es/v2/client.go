@@ -2,7 +2,10 @@ package v2
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
+	"path"
+	"strings"
 
 	"github.com/pkg/errors"
 	"gopkg.in/olivere/elastic.v3"
@@ -48,6 +51,27 @@ func NewClient(clusterURL string) (*Client, error) {
 		client:          client,
 		clusterEndpoint: clusterEndpoint,
 	}, nil
+}
+
+// EnableReallocation enables shard reallocation
+// Modifies cluster.routing.allocation.enable to "all"
+// https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
+func (c *Client) EnableReallocation() error {
+	httpClient := &http.Client{}
+	endpoint := path.Join(c.clusterEndpoint, "_cluster", "settings")
+
+	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"all"}}`))
+	if err != nil {
+		return errors.Wrap(err, "failed to make EnableReallocation request")
+	}
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "failed to execute EnableReallocation request")
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
 
 // ListNodes returns the list of node names
