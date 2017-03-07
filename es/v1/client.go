@@ -188,7 +188,7 @@ func (c *Client) ListShardsOnNode(nodeName string) ([]string, error) {
 	shardsOnNode := []string{}
 
 	for _, line := range lines {
-		if strings.HasSuffix(line, nodeName) {
+		if strings.Contains(line, nodeName) {
 			shardsOnNode = append(shardsOnNode, line)
 		}
 	}

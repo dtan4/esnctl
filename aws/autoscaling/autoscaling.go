@@ -19,6 +19,22 @@ func New(api autoscalingiface.AutoScalingAPI) *Client {
 	}
 }
 
+// DetachInstance detaches instance from the given ASG
+func (c *Client) DetachInstance(groupName, instanceID string) error {
+	_, err := c.api.DetachInstances(&autoscaling.DetachInstancesInput{
+		AutoScalingGroupName: aws.String(groupName),
+		InstanceIds: []*string{
+			aws.String(instanceID),
+		},
+		ShouldDecrementDesiredCapacity: aws.Bool(true),
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to detach instance")
+	}
+
+	return nil
+}
+
 // IncreaseInstances increases the number of instance
 func (c *Client) IncreaseInstances(groupName string, delta int) (int, error) {
 	resp, err := c.api.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
@@ -47,4 +63,20 @@ func (c *Client) IncreaseInstances(groupName string, delta int) (int, error) {
 	}
 
 	return int(targetDesiredCapacity), nil
+}
+
+// RetrieveTargetGroup retrieves target group ARN attached to the given ASG
+func (c *Client) RetrieveTargetGroup(groupName string) (string, error) {
+	resp, err := c.api.DescribeLoadBalancerTargetGroups(&autoscaling.DescribeLoadBalancerTargetGroupsInput{
+		AutoScalingGroupName: aws.String(groupName),
+	})
+	if err != nil {
+		return "", errors.Wrap(err, "failed to retirve attached target group")
+	}
+
+	if len(resp.LoadBalancerTargetGroups) == 0 {
+		return "", errors.Errorf("no target group is attached to %q", groupName)
+	}
+
+	return aws.StringValue(resp.LoadBalancerTargetGroups[0].LoadBalancerTargetGroupARN), nil
 }
