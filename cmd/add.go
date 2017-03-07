@@ -83,7 +83,7 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		}
 
 		retryCount++
-		time.Sleep(addSleepSeconds)
+		time.Sleep(addSleepSeconds * time.Second)
 	}
 
 	fmt.Println("===> Enabling shard reallocation...")
