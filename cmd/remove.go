@@ -21,14 +21,26 @@ var removeCmd = &cobra.Command{
 	RunE:  doRemove,
 }
 
-func doRemove(cmd *cobra.Command, args []string) error {
-	if len(args) != 2 {
-		return errors.New("cluster URL and node name must be specified")
-	}
-	clusterURL := args[0]
-	nodeName := args[1]
+var removeOpts = struct {
+	autoScalingGroup string
+	clusterURL       string
+	nodeName         string
+}{}
 
-	client, err := es.New(clusterURL)
+func doRemove(cmd *cobra.Command, args []string) error {
+	if removeOpts.autoScalingGroup == "" {
+		return errors.New("AutoScaling Group must be specified")
+	}
+
+	if removeOpts.clusterURL == "" {
+		return errors.New("Elasticsearch cluster URL must be specified")
+	}
+
+	if removeOpts.nodeName == "" {
+		return errors.New("Elasticsearch Node name must be specified")
+	}
+
+	client, err := es.New(removeOpts.clusterURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}
@@ -37,14 +49,14 @@ func doRemove(cmd *cobra.Command, args []string) error {
 
 	// TODO: wait for connection draining
 
-	if err := client.ExcludeNodeFromAllocation(nodeName); err != nil {
+	if err := client.ExcludeNodeFromAllocation(removeOpts.nodeName); err != nil {
 		return errors.Wrap(err, "failed to exclude node from allocation group")
 	}
 
 	retryCount := 0
 
 	for {
-		shards, err := client.ListShardsOnNode(nodeName)
+		shards, err := client.ListShardsOnNode(removeOpts.nodeName)
 		if err != nil {
 			return errors.Wrap(err, "failed to list shards on the given node")
 		}
@@ -64,7 +76,7 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		time.Sleep(removeSleepSeconds * time.Second)
 	}
 
-	if err := client.Shutdown(nodeName); err != nil {
+	if err := client.Shutdown(removeOpts.nodeName); err != nil {
 		return errors.Wrap(err, "failed to shutdown node")
 	}
 
@@ -75,4 +87,8 @@ func doRemove(cmd *cobra.Command, args []string) error {
 
 func init() {
 	RootCmd.AddCommand(removeCmd)
+
+	addCmd.Flags().StringVar(&removeOpts.autoScalingGroup, "group", "", "AutoScaling Group")
+	addCmd.Flags().StringVar(&removeOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
+	addCmd.Flags().StringVar(&removeOpts.nodeName, "node-name", "", "Elasticsearch node name to remove")
 }
