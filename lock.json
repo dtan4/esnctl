@@ -1,5 +1,5 @@
 {
-    "memo": "3f17267d7e8fdd4148c193715e3aa536b13b761e3d64a49a6318ad38da2c5bf2",
+    "memo": "430bf0f4d3e77b1879ff13854e3336bfecbd97302df1d6fe1604dee320cfb638",
     "projects": [
         {
             "name": "github.com/aws/aws-sdk-go",
@@ -8,8 +8,13 @@
             "packages": [
                 "aws",
                 "aws/request",
+                "aws/session",
                 "service/autoscaling",
-                "service/autoscaling/autoscalingiface"
+                "service/autoscaling/autoscalingiface",
+                "service/ec2",
+                "service/ec2/ec2iface",
+                "service/elbv2",
+                "service/elbv2/elbv2iface"
             ]
         },
         {
