@@ -42,14 +42,20 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}
 
+	fmt.Println("===> Disabling shard reallocation...")
+
 	if err := client.DisableReallocation(); err != nil {
 		return errors.Wrap(err, "failed to disable reallocation")
 	}
+
+	fmt.Printf("===> Adding %d instances...\n", delta)
 
 	desiredCapacity, err := aws.AutoScaling.IncreaseInstances(autoScalingGroup, delta)
 	if err != nil {
 		return errors.Wrap(err, "failed to increase instance")
 	}
+
+	fmt.Println("===> Waiting for nodes join to Elasticsearch cluster...")
 
 	retryCount := 0
 
@@ -73,6 +79,8 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		retryCount++
 		time.Sleep(addSleepSeconds)
 	}
+
+	fmt.Println("===> Enabling shard reallocation...")
 
 	if err := client.EnableReallocation(); err != nil {
 		return errors.Wrap(err, "failed to enable reallocation")
