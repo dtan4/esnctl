@@ -10,7 +10,8 @@ import (
 
 // Client represents Elasticsearch API client
 type Client struct {
-	client *elastic.Client
+	client          *elastic.Client
+	clusterEndpoint string
 }
 
 // NewClient creates new Client object
@@ -19,13 +20,13 @@ func NewClient(clusterURL string) (*Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse cluster URL")
 	}
-	plainURL := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+	clusterEndpoint := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
 
 	var client *elastic.Client
 
 	if u.User == nil {
 		client, err = elastic.NewClient(
-			elastic.SetURL(plainURL),
+			elastic.SetURL(clusterEndpoint),
 			elastic.SetSniff(false),
 		)
 		if err != nil {
@@ -34,7 +35,7 @@ func NewClient(clusterURL string) (*Client, error) {
 	} else {
 		password, _ := u.User.Password()
 		client, err = elastic.NewClient(
-			elastic.SetURL(plainURL),
+			elastic.SetURL(clusterEndpoint),
 			elastic.SetBasicAuth(u.User.Username(), password),
 			elastic.SetSniff(false),
 		)
@@ -44,7 +45,8 @@ func NewClient(clusterURL string) (*Client, error) {
 	}
 
 	return &Client{
-		client: client,
+		client:          client,
+		clusterEndpoint: clusterEndpoint,
 	}, nil
 }
 
