@@ -60,7 +60,7 @@ List nodes
 
 ```bash
 $ esnctl add \
-  --cluster-url http://elasticsearch.example.com:9200
+  --cluster-url http://elasticsearch.example.com
 ip-10-0-1-21.ap-northeast-1.compute.internal
 ip-10-0-1-22.ap-northeast-1.compute.internal
 ip-10-0-1-23.ap-northeast-1.compute.internal
