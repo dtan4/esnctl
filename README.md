@@ -7,7 +7,7 @@ Elasticsearch Node Controller with AWS AutoScaling Group
 
 ## Why
 
-Graceful Elasticsearch node add/remove requires several steps.
+Graceful Elasticsearch node addition/removal requires several steps.
 
 ### Add node
 
