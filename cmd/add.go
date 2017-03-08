@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/dtan4/esnctl/aws"
@@ -43,7 +44,9 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		return errors.New("number to add instances must be greater than 0")
 	}
 
-	client, err := es.New(addOpts.clusterURL)
+	httpClient := &http.Client{}
+
+	client, err := es.New(addOpts.clusterURL, httpClient)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}

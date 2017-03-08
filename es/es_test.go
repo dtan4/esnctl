@@ -1,6 +1,7 @@
 package es
 
 import (
+	"net/http"
 	"testing"
 
 	"gopkg.in/h2non/gock.v1"
@@ -51,7 +52,7 @@ func TestDetectVersion(t *testing.T) {
 	for _, tc := range testcases {
 		gock.New(tc.clusterURL).Get("/").Reply(200).BodyString(tc.body)
 
-		got, err := DetectVersion(tc.clusterURL)
+		got, err := DetectVersion(tc.clusterURL, &http.Client{})
 		if err != nil {
 			t.Errorf("error should not be raised: %s", err)
 		}

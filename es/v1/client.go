@@ -15,10 +15,11 @@ import (
 type Client struct {
 	client          *elastic.Client
 	clusterEndpoint string
+	httpClient      *http.Client
 }
 
 // NewClient creates new Client object
-func NewClient(clusterURL string) (*Client, error) {
+func NewClient(clusterURL string, httpClient *http.Client) (*Client, error) {
 	u, err := url.Parse(clusterURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse cluster URL")
@@ -46,6 +47,7 @@ func NewClient(clusterURL string) (*Client, error) {
 	return &Client{
 		client:          client,
 		clusterEndpoint: clusterEndpoint,
+		httpClient:      httpClient,
 	}, nil
 }
 
@@ -53,7 +55,6 @@ func NewClient(clusterURL string) (*Client, error) {
 // Modifies cluster.routing.allocation.enable to "none"
 // https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
 func (c *Client) DisableReallocation() error {
-	httpClient := &http.Client{}
 	endpoint := c.clusterEndpoint + "/_cluster/settings"
 
 	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"none"}}`))
@@ -62,7 +63,7 @@ func (c *Client) DisableReallocation() error {
 	}
 	defer req.Body.Close()
 
-	resp, err := httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute DisableReallocation request")
 	}
@@ -84,7 +85,6 @@ func (c *Client) DisableReallocation() error {
 // Modifies cluster.routing.allocation.enable to "all"
 // https://www.elastic.co/guide/en/elasticsearch/reference/1.5/cluster-update-settings.html
 func (c *Client) EnableReallocation() error {
-	httpClient := &http.Client{}
 	endpoint := c.clusterEndpoint + "/_cluster/settings"
 
 	req, err := http.NewRequest("PUT", endpoint, strings.NewReader(`{"transient":{"cluster.routing.allocation.enable":"all"}}`))
@@ -93,7 +93,7 @@ func (c *Client) EnableReallocation() error {
 	}
 	defer req.Body.Close()
 
-	resp, err := httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute EnableReallocation request")
 	}
@@ -114,7 +114,6 @@ func (c *Client) EnableReallocation() error {
 // ExcludeNodeFromAllocation excludes the given node from shard allocation group
 // https://www.elastic.co/guide/en/elasticsearch/reference/current/allocation-filtering.html
 func (c *Client) ExcludeNodeFromAllocation(nodeName string) error {
-	httpClient := &http.Client{}
 	endpoint := c.clusterEndpoint + "/_cluster/settings"
 	reqBody := fmt.Sprintf(`{"transient":{"cluster.routing.allocation.exclude._name":"%s"}}`, nodeName)
 
@@ -124,7 +123,7 @@ func (c *Client) ExcludeNodeFromAllocation(nodeName string) error {
 	}
 	defer req.Body.Close()
 
-	resp, err := httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute ExcludeNodeFromAllocation request")
 	}
@@ -160,7 +159,6 @@ func (c *Client) ListNodes() ([]string, error) {
 
 // ListShards returns the list of shards on the given node
 func (c *Client) ListShardsOnNode(nodeName string) ([]string, error) {
-	httpClient := &http.Client{}
 	endpoint := c.clusterEndpoint + "/_cat/shards/"
 
 	req, err := http.NewRequest("GET", endpoint, nil)
@@ -168,7 +166,7 @@ func (c *Client) ListShardsOnNode(nodeName string) ([]string, error) {
 		return []string{}, errors.Wrap(err, "failed to make cat-shards request")
 	}
 
-	resp, err := httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return []string{}, errors.Wrap(err, "failed to execute Shutdown request")
 	}
@@ -198,7 +196,6 @@ func (c *Client) ListShardsOnNode(nodeName string) ([]string, error) {
 
 // Shutdown shutdowns the given node
 func (c *Client) Shutdown(nodeName string) error {
-	httpClient := &http.Client{}
 	endpoint := c.clusterEndpoint + "/_cluster/nodes/" + nodeName + "/_shutdown"
 
 	req, err := http.NewRequest("POST", endpoint, nil)
@@ -206,7 +203,7 @@ func (c *Client) Shutdown(nodeName string) error {
 		return errors.Wrap(err, "failed to make Shutdown request")
 	}
 
-	resp, err := httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return errors.Wrap(err, "failed to execute Shutdown request")
 	}
