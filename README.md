@@ -35,6 +35,10 @@ We realize that these operations should be automated and conducted by ONE action
   - Using [EC2 Discovery](https://www.elastic.co/guide/en/elasticsearch/plugins/current/discovery-ec2-discovery.html)
 - EC2 instances are managed by __AWS Auto Scaling Groups__
   - Instances (= Nodes) can be added/removed by modifying DesiredCapacity
+- EC2 instances and Auto Scaling Group are attached to __Target Group__
+  - Cluster can be accessed through Application Load Balancer
+
+(TODO: architecture image here)
 
 ## Installation
 
@@ -42,11 +46,81 @@ TBD
 
 ## Usage
 
+To run `esnctl add` or `esnctl remove`, you need to set valid AWS credentials beforehand.
+
+```bash
+export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX
+export AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+export AWS_REGION=xx-yyyy-0
+```
+
 ### `esnctl list`
+
+List nodes
+
+```bash
+$ esnctl add \
+  --cluster-url http://elasticsearch.example.com:9200
+ip-10-0-1-21.ap-northeast-1.compute.internal
+ip-10-0-1-22.ap-northeast-1.compute.internal
+ip-10-0-1-23.ap-northeast-1.compute.internal
+```
+
+|Option|Description|
+|---------|-----------|
+|`--cluster-url=CLUSTERURL`|Elasticsearch cluster URL|
 
 ### `esnctl add`
 
+Add nodes
+
+```bash
+$ esnctl add \
+  --cluster-url http://elasticsearch.example.com \
+  --group elasticsearch \
+  -n 2
+===> Disabling shard reallocation...
+===> Launching 2 instances on elasticsearch...
+===> Waiting for nodes join to Elasticsearch cluster...
+........................
+===> Enabling shard reallocation...
+```
+
+|Option|Description|
+|---------|-----------|
+|`--group=GROUP`|Auto Scaling Group|
+|`--cluster-url=CLUSTERURL`|Elasticsearch cluster URL|
+|`-n`, `--number=NUMBER`|Number to add instances|
+|`--region=REGION`|AWS region|
+
 ### `esnctl remove`
+
+Remove a node
+
+Only 1 node can be removed at the same time.
+
+```bash
+$ esnctl remove \
+  --cluster-url http://elasticsearch.example.com \
+  --group elasticsearch \
+  --node-name ip-10-0-1-21.ap-northeast-1.compute.internal
+===> Retrieving target instance ID...
+===> Retrieving target group...
+===> Detaching instance from target group...
+............................................................
+===> Excluding target node from shard allocation group...
+===> Waiting for shards escape from target node...
+..................
+===> Shutting down target node...
+===> Detaching target instance...
+```
+
+|Option|Description|
+|---------|-----------|
+|`--group=GROUP`|Auto Scaling Group|
+|`--cluster-url=CLUSTERURL`|Elasticsearch cluster URL|
+|`--node-name=NODENAME`|Elasticsearch node name to remove|
+|`--region=REGION`|AWS region|
 
 ## Author
 
