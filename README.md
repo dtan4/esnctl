@@ -42,7 +42,18 @@ We realize that these operations should be automated and conducted by ONE action
 
 ## Installation
 
-TBD
+### Precompiled binary
+
+Precompiled binaries for Windows, OS X, Linux are available at [Releases](https://github.com/dtan4/esnctl/releases).
+
+### From source
+
+```bash
+$ go get -d github.com/dtan4/esnctl
+$ cd $GOPATH/src/github.com/dtan4/esnctl
+$ make deps
+$ make install
+```
 
 ## Usage
 
