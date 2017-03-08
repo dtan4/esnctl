@@ -32,7 +32,7 @@ var removeOpts = struct {
 
 func doRemove(cmd *cobra.Command, args []string) error {
 	if removeOpts.autoScalingGroup == "" {
-		return errors.New("AutoScaling Group must be specified")
+		return errors.New("Auto Scaling Group must be specified")
 	}
 
 	if removeOpts.clusterURL == "" {
@@ -157,7 +157,7 @@ func doRemove(cmd *cobra.Command, args []string) error {
 func init() {
 	RootCmd.AddCommand(removeCmd)
 
-	removeCmd.Flags().StringVar(&removeOpts.autoScalingGroup, "group", "", "AutoScaling Group")
+	removeCmd.Flags().StringVar(&removeOpts.autoScalingGroup, "group", "", "Auto Scaling Group")
 	removeCmd.Flags().StringVar(&removeOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
 	removeCmd.Flags().StringVar(&removeOpts.nodeName, "node-name", "", "Elasticsearch node name to remove")
 	removeCmd.Flags().StringVar(&removeOpts.region, "region", "", "AWS region")

@@ -38,7 +38,7 @@ func doAdd(cmd *cobra.Command, args []string) error {
 	}
 
 	if addOpts.autoScalingGroup == "" {
-		return errors.New("AutoScaling Group must be specified")
+		return errors.New("Auto Scaling Group must be specified")
 	}
 
 	if addOpts.delta < 1 {
@@ -106,7 +106,7 @@ func doAdd(cmd *cobra.Command, args []string) error {
 func init() {
 	RootCmd.AddCommand(addCmd)
 
-	addCmd.Flags().StringVar(&addOpts.autoScalingGroup, "group", "", "AutoScaling Group")
+	addCmd.Flags().StringVar(&addOpts.autoScalingGroup, "group", "", "Auto Scaling Group")
 	addCmd.Flags().StringVar(&addOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
 	addCmd.Flags().IntVarP(&addOpts.delta, "number", "n", 0, "Number to add instances")
 	addCmd.Flags().StringVar(&addOpts.region, "region", "", "AWS region")
