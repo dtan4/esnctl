@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	// AutoScaling represents AutoScaling service client
+	// AutoScaling represents Auto Scaling service client
 	AutoScaling *autoscaling.Client
 	// EC2 represents EC2 service client
 	EC2 *ec2.Client

@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Client represents a wrapper of AutoScaling API
+// Client represents a wrapper of Auto Scaling API
 type Client struct {
 	api autoscalingiface.AutoScalingAPI
 }
@@ -47,7 +47,7 @@ func (c *Client) IncreaseInstances(groupName string, delta int) (int, error) {
 	}
 
 	if len(resp.AutoScalingGroups) == 0 {
-		return -1, errors.Errorf("AutoScaling Groups %q does not exist", groupName)
+		return -1, errors.Errorf("Auto Scaling Group %q does not exist", groupName)
 	}
 	asg := resp.AutoScalingGroups[0]
 
