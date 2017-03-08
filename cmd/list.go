@@ -17,13 +17,16 @@ var listCmd = &cobra.Command{
 	RunE:          doList,
 }
 
-func doList(cmd *cobra.Command, args []string) error {
-	if len(args) != 1 {
-		return errors.New("cluster URL must be specified")
-	}
-	clusterURL := args[0]
+var listOpts = struct {
+	clusterURL string
+}{}
 
-	client, err := es.New(clusterURL)
+func doList(cmd *cobra.Command, args []string) error {
+	if listOpts.clusterURL == "" {
+		return errors.New("Elasticsearch cluster URL must be specified")
+	}
+
+	client, err := es.New(listOpts.clusterURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}
@@ -42,4 +45,6 @@ func doList(cmd *cobra.Command, args []string) error {
 
 func init() {
 	RootCmd.AddCommand(listCmd)
+
+	listCmd.Flags().StringVar(&listOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
 }
