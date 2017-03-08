@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/dtan4/esnctl/es"
 	"github.com/pkg/errors"
@@ -26,7 +27,9 @@ func doList(cmd *cobra.Command, args []string) error {
 		return errors.New("Elasticsearch cluster URL must be specified")
 	}
 
-	client, err := es.New(listOpts.clusterURL)
+	httpClient := &http.Client{}
+
+	client, err := es.New(listOpts.clusterURL, httpClient)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}

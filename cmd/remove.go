@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/dtan4/esnctl/aws"
@@ -42,7 +43,9 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.New("Elasticsearch Node name must be specified")
 	}
 
-	client, err := es.New(removeOpts.clusterURL)
+	httpClient := &http.Client{}
+
+	client, err := es.New(removeOpts.clusterURL, httpClient)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
 	}

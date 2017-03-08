@@ -14,8 +14,8 @@ import (
 )
 
 // New creates and returns appropriate Elasticsearch client
-func New(clusterURL string) (Client, error) {
-	version, err := DetectVersion(clusterURL)
+func New(clusterURL string, httpClient *http.Client) (Client, error) {
+	version, err := DetectVersion(clusterURL, httpClient)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to detect Elasticsearch version")
 	}
@@ -24,14 +24,14 @@ func New(clusterURL string) (Client, error) {
 
 	switch digits[0] {
 	case "1":
-		client, err := v1.NewClient(clusterURL)
+		client, err := v1.NewClient(clusterURL, httpClient)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}
 
 		return client, nil
 	case "2":
-		client, err := v2.NewClient(clusterURL)
+		client, err := v2.NewClient(clusterURL, httpClient)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}
@@ -43,7 +43,7 @@ func New(clusterURL string) (Client, error) {
 }
 
 // DetectVersion returns Elasticsearch version of the given endpoint
-func DetectVersion(clusterURL string) (string, error) {
+func DetectVersion(clusterURL string, httpClient *http.Client) (string, error) {
 	u, err := url.Parse(clusterURL)
 	if err != nil {
 		return "", errors.Wrap(err, "cluster URL is invalid")
@@ -57,7 +57,12 @@ func DetectVersion(clusterURL string) (string, error) {
 		endpoint = fmt.Sprintf("%s://%s@%s/", u.Scheme, u.User.String(), u.Host)
 	}
 
-	resp, err := http.Get(endpoint)
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to make http request")
+	}
+
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to access to root API")
 	}

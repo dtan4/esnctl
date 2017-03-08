@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"net/http"
 	"testing"
 
 	"gopkg.in/h2non/gock.v1"
@@ -14,6 +15,7 @@ func TestDisableReallocation(t *testing.T) {
 	client := &Client{
 		client:          nil,
 		clusterEndpoint: testClusterEndpoint,
+		httpClient:      &http.Client{},
 	}
 
 	gock.New(testClusterEndpoint).Put("/_cluster/settings").BodyString(`{"transient":{"cluster.routing.allocation.enable":"none"}}`).Reply(200)
@@ -29,6 +31,7 @@ func TestEnableReallocation(t *testing.T) {
 	client := &Client{
 		client:          nil,
 		clusterEndpoint: testClusterEndpoint,
+		httpClient:      &http.Client{},
 	}
 
 	gock.New(testClusterEndpoint).Put("/_cluster/settings").BodyString(`{"transient":{"cluster.routing.allocation.enable":"all"}}`).Reply(200)
@@ -44,6 +47,7 @@ func TestExcludeNodeFromAllocation(t *testing.T) {
 	client := &Client{
 		client:          nil,
 		clusterEndpoint: testClusterEndpoint,
+		httpClient:      &http.Client{},
 	}
 
 	gock.New(testClusterEndpoint).Put("/_cluster/settings").BodyString(`{"transient":{"cluster.routing.allocation.exclude._name":"ip-10-0-1-23.ap-northeast-1.compute.internal"}}`).Reply(200)
@@ -61,6 +65,7 @@ func TestListShardsOnNode(t *testing.T) {
 	client := &Client{
 		client:          nil,
 		clusterEndpoint: testClusterEndpoint,
+		httpClient:      &http.Client{},
 	}
 
 	gock.New(testClusterEndpoint).Get("/_cat/shards").Reply(200).BodyString(`wiki1 0 p STARTED 3014 31.1mb 192.168.56.10 ip-10-0-1-23.ap-northeast-1.compute.internal
