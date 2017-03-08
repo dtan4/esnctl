@@ -26,6 +26,7 @@ var removeOpts = struct {
 	autoScalingGroup string
 	clusterURL       string
 	nodeName         string
+	region           string
 }{}
 
 func doRemove(cmd *cobra.Command, args []string) error {
@@ -44,6 +45,10 @@ func doRemove(cmd *cobra.Command, args []string) error {
 	client, err := es.New(removeOpts.clusterURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
+	}
+
+	if err := aws.Initialize(removeOpts.region); err != nil {
+		return errors.Wrap(err, "failed to initialize AWS service clients")
 	}
 
 	fmt.Println("===> Retrieving target instance ID...")
@@ -152,4 +157,5 @@ func init() {
 	removeCmd.Flags().StringVar(&removeOpts.autoScalingGroup, "group", "", "AutoScaling Group")
 	removeCmd.Flags().StringVar(&removeOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
 	removeCmd.Flags().StringVar(&removeOpts.nodeName, "node-name", "", "Elasticsearch node name to remove")
+	removeCmd.Flags().StringVar(&removeOpts.region, "region", "", "AWS region")
 }

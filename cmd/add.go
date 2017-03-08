@@ -28,6 +28,7 @@ var addOpts = struct {
 	autoScalingGroup string
 	clusterURL       string
 	delta            int
+	region           string
 }{}
 
 func doAdd(cmd *cobra.Command, args []string) error {
@@ -46,6 +47,10 @@ func doAdd(cmd *cobra.Command, args []string) error {
 	client, err := es.New(addOpts.clusterURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to create Elasitcsearch API client")
+	}
+
+	if err := aws.Initialize(addOpts.region); err != nil {
+		return errors.Wrap(err, "failed to initialize AWS service clients")
 	}
 
 	fmt.Println("===> Disabling shard reallocation...")
@@ -101,4 +106,5 @@ func init() {
 	addCmd.Flags().StringVar(&addOpts.autoScalingGroup, "group", "", "AutoScaling Group")
 	addCmd.Flags().StringVar(&addOpts.clusterURL, "cluster-url", "", "Elasticsearch cluster URL")
 	addCmd.Flags().IntVarP(&addOpts.delta, "number", "n", 0, "Number to add instances")
+	addCmd.Flags().StringVar(&addOpts.region, "region", "", "AWS region")
 }
