@@ -100,6 +100,8 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to enable reallocation")
 	}
 
+	fmt.Println("===> Finished!")
+
 	return nil
 }
 

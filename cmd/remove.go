@@ -151,6 +151,8 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to detach instance from AutoScaling Group")
 	}
 
+	fmt.Println("===> Finished!")
+
 	return nil
 }
 
