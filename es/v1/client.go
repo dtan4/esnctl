@@ -157,7 +157,7 @@ func (c *Client) ListNodes() ([]string, error) {
 	return nodes, nil
 }
 
-// ListShards returns the list of shards on the given node
+// ListShardsOnNode returns the list of shards on the given node
 func (c *Client) ListShardsOnNode(nodeName string) ([]string, error) {
 	endpoint := c.clusterEndpoint + "/_cat/shards/"
 
