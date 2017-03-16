@@ -47,6 +47,24 @@ func TestDetectVersion(t *testing.T) {
 `,
 			expected: "2.3.0",
 		},
+		{
+			clusterURL: "http://example-v2.com:9200",
+			body: `{
+  "name" : "McKXuFt",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "6hahWxiST-mTH3glVgRe1g",
+  "version" : {
+    "number" : "5.2.2",
+    "build_hash" : "f9d9b74",
+    "build_date" : "2017-02-24T17:26:45.835Z",
+    "build_snapshot" : false,
+    "lucene_version" : "6.4.1"
+  },
+  "tagline" : "You Know, for Search"
+}
+`,
+			expected: "5.2.2",
+		},
 	}
 
 	for _, tc := range testcases {

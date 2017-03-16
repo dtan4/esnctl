@@ -30,7 +30,7 @@ We realize that these operations should be automated and conducted by ONE action
 
 ## Required environment
 
-- Elasticsearch 1.x / 2.x
+- Elasticsearch 1.x / 2.x / 5.x
 - Elasticsearch cluster is running on __AWS EC2 instances__
   - Using [EC2 Discovery](https://www.elastic.co/guide/en/elasticsearch/plugins/current/discovery-ec2-discovery.html)
 - EC2 instances are managed by __AWS Auto Scaling Groups__
