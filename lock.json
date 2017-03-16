@@ -1,5 +1,5 @@
 {
-    "memo": "430bf0f4d3e77b1879ff13854e3336bfecbd97302df1d6fe1604dee320cfb638",
+    "memo": "296ebb5cc7ef9e765634f5e1ab503262f650ff1dc6c39f8bb4bd903dbd562dd0",
     "projects": [
         {
             "name": "github.com/aws/aws-sdk-go",
@@ -102,6 +102,14 @@
             "name": "gopkg.in/olivere/elastic.v3",
             "version": "v3.0.66",
             "revision": "90486b697c7b506d7d949b8ba0c1a7b849db5db6",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "gopkg.in/olivere/elastic.v5",
+            "version": "v5.0.29",
+            "revision": "3901ec7ce170cd5b0ccb2720893c399d24d295c6",
             "packages": [
                 "."
             ]
