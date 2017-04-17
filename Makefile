@@ -31,7 +31,7 @@ clean:
 	rm -rf vendor/*
 
 .PHONY: cross-build
-cross-build: deps
+cross-build:
 	set -e; \
 	for os in darwin linux windows; do \
 		for arch in amd64 386; do \
