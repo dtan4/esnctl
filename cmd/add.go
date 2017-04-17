@@ -34,12 +34,12 @@ var addOpts = struct {
 }{}
 
 func doAdd(cmd *cobra.Command, args []string) error {
-	if addOpts.clusterURL == "" {
-		return errors.New("Elasticsearch cluster URL must be specified")
+	if addOpts.autoScalingGroup == "" {
+		return errors.New("Auto Scaling Group (--group) must be specified")
 	}
 
-	if addOpts.autoScalingGroup == "" {
-		return errors.New("Auto Scaling Group must be specified")
+	if addOpts.clusterURL == "" {
+		return errors.New("Elasticsearch cluster URL (--cluster-url) must be specified")
 	}
 
 	if addOpts.delta < 1 {
