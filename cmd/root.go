@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -18,9 +18,9 @@ var RootCmd = &cobra.Command{
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
 		if trace := os.Getenv("TRACE"); trace == "1" {
-			fmt.Printf("%+v\n", err)
+			log.Printf("%+v\n", err)
 		} else {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		os.Exit(1)

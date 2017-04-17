@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -56,20 +57,20 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to initialize AWS service clients")
 	}
 
-	fmt.Println("===> Disabling shard reallocation...")
+	log.Println("===> Disabling shard reallocation...")
 
 	if err := client.DisableReallocation(); err != nil {
 		return errors.Wrap(err, "failed to disable reallocation")
 	}
 
-	fmt.Printf("===> Launching %d instances on %s...\n", addOpts.delta, addOpts.autoScalingGroup)
+	log.Printf("===> Launching %d instances on %s...\n", addOpts.delta, addOpts.autoScalingGroup)
 
 	desiredCapacity, err := aws.AutoScaling.IncreaseInstances(addOpts.autoScalingGroup, addOpts.delta)
 	if err != nil {
 		return errors.Wrap(err, "failed to increase instance")
 	}
 
-	fmt.Println("===> Waiting for nodes join to Elasticsearch cluster...")
+	log.Println("===> Waiting for nodes join to Elasticsearch cluster...")
 
 	retryCount := 0
 
@@ -94,13 +95,13 @@ func doAdd(cmd *cobra.Command, args []string) error {
 		time.Sleep(addSleepSeconds * time.Second)
 	}
 
-	fmt.Println("===> Enabling shard reallocation...")
+	log.Println("===> Enabling shard reallocation...")
 
 	if err := client.EnableReallocation(); err != nil {
 		return errors.Wrap(err, "failed to enable reallocation")
 	}
 
-	fmt.Println("===> Finished!")
+	log.Println("===> Finished!")
 
 	return nil
 }

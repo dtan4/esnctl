@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -54,27 +55,27 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to initialize AWS service clients")
 	}
 
-	fmt.Println("===> Retrieving target instance ID...")
+	log.Println("===> Retrieving target instance ID...")
 
 	instanceID, err := aws.EC2.RetrieveInstanceIDFromPrivateDNS(removeOpts.nodeName)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve instance ID")
 	}
 
-	fmt.Println("===> Retrieving target group...")
+	log.Println("===> Retrieving target group...")
 
 	targetGroupARN, err := aws.AutoScaling.RetrieveTargetGroup(removeOpts.autoScalingGroup)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve target group")
 	}
 
-	fmt.Println("===> Detaching instance from target group...")
+	log.Println("===> Detaching instance from target group...")
 
 	if err := aws.ELBv2.DetachInstance(targetGroupARN, instanceID); err != nil {
 		return errors.Wrap(err, "failed to detach instance from target group")
 	}
 
-	fmt.Println("===> Waiting for connection draining...")
+	log.Println("===> Waiting for connection draining...")
 
 	retryCount := 0
 
@@ -108,13 +109,13 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		time.Sleep(removeSleepSeconds * time.Second)
 	}
 
-	fmt.Println("===> Excluding target node from shard allocation group...")
+	log.Println("===> Excluding target node from shard allocation group...")
 
 	if err := client.ExcludeNodeFromAllocation(removeOpts.nodeName); err != nil {
 		return errors.Wrap(err, "failed to exclude node from allocation group")
 	}
 
-	fmt.Println("===> Waiting for shards escape from target node...")
+	log.Println("===> Waiting for shards escape from target node...")
 
 	retryCount = 0
 
@@ -139,19 +140,19 @@ func doRemove(cmd *cobra.Command, args []string) error {
 		time.Sleep(removeSleepSeconds * time.Second)
 	}
 
-	fmt.Println("===> Shutting down target node...")
+	log.Println("===> Shutting down target node...")
 
 	if err := client.Shutdown(removeOpts.nodeName); err != nil {
 		return errors.Wrap(err, "failed to shutdown node")
 	}
 
-	fmt.Println("===> Detaching target instance...")
+	log.Println("===> Detaching target instance...")
 
 	if err := aws.AutoScaling.DetachInstance(removeOpts.autoScalingGroup, instanceID); err != nil {
 		return errors.Wrap(err, "failed to detach instance from AutoScaling Group")
 	}
 
-	fmt.Println("===> Finished!")
+	log.Println("===> Finished!")
 
 	return nil
 }
