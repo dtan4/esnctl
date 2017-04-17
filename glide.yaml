@@ -1,0 +1,29 @@
+package: github.com/dtan4/esnctl
+import:
+- package: github.com/aws/aws-sdk-go
+  version: ~1.7.4
+  subpackages:
+  - aws
+  - aws/request
+  - aws/session
+  - service/autoscaling
+  - service/autoscaling/autoscalingiface
+  - service/ec2
+  - service/ec2/ec2iface
+  - service/elbv2
+  - service/elbv2/elbv2iface
+- package: github.com/golang/mock
+  subpackages:
+  - gomock
+- package: github.com/pkg/errors
+  version: ~0.8.0
+- package: github.com/spf13/cobra
+- package: gopkg.in/olivere/elastic.v2
+  version: ~v2.0.58
+- package: gopkg.in/olivere/elastic.v3
+  version: ~v3.0.68
+- package: gopkg.in/olivere/elastic.v5
+  version: v5.0.34
+testImport:
+- package: gopkg.in/h2non/gock.v1
+  version: ~1.0.4

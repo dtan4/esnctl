@@ -24,7 +24,7 @@ var listOpts = struct {
 
 func doList(cmd *cobra.Command, args []string) error {
 	if listOpts.clusterURL == "" {
-		return errors.New("Elasticsearch cluster URL must be specified")
+		return errors.New("Elasticsearch cluster (--cluster-url) must be specified")
 	}
 
 	httpClient := &http.Client{}

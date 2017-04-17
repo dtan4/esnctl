@@ -31,7 +31,7 @@ clean:
 	rm -rf vendor/*
 
 .PHONY: cross-build
-cross-build: deps
+cross-build:
 	set -e; \
 	for os in darwin linux windows; do \
 		for arch in amd64 386; do \
@@ -39,15 +39,9 @@ cross-build: deps
 		done; \
 	done
 
-.PHONY: dep
-dep:
-ifeq ($(shell command -v dep 2> /dev/null),)
-	go get -u -v github.com/golang/dep/...
-endif
-
 .PHONY: deps
-deps: dep mockgen
-	dep ensure
+deps: glide mockgen
+	glide install
 
 .PHONY: dist
 dist:
@@ -57,6 +51,12 @@ dist:
 	$(DIST_DIRS) tar -zcf $(NAME)-$(VERSION)-{}.tar.gz {} \; && \
 	$(DIST_DIRS) zip -r $(NAME)-$(VERSION)-{}.zip {} \; && \
 	cd ..
+
+.PHONY: glide
+glide:
+ifeq ($(shell command -v glide 2> /dev/null),)
+	curl https://glide.sh/get | sh
+endif
 
 .PHONY: install
 install:
