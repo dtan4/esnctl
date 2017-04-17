@@ -34,12 +34,12 @@ var removeOpts = struct {
 }{}
 
 func doRemove(cmd *cobra.Command, args []string) error {
-	if removeOpts.autoScalingGroup == "" {
-		return errors.New("Auto Scaling Group (--group) must be specified")
-	}
-
 	if removeOpts.clusterURL == "" {
 		return errors.New("Elasticsearch cluster URL (--cluster-url) must be specified")
+	}
+
+	if removeOpts.autoScalingGroup == "" {
+		return errors.New("Auto Scaling Group (--group) must be specified")
 	}
 
 	if removeOpts.nodeName == "" {
