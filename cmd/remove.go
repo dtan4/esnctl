@@ -19,9 +19,11 @@ const (
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
-	Use:   "remove",
-	Short: "Remove node from Elasticsearch cluster",
-	RunE:  doRemove,
+	SilenceErrors: true,
+	SilenceUsage:  true,
+	Use:           "remove",
+	Short:         "Remove node from Elasticsearch cluster",
+	RunE:          doRemove,
 }
 
 var removeOpts = struct {
