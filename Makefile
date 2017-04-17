@@ -47,7 +47,7 @@ endif
 
 .PHONY: deps
 deps: dep mockgen
-	dep ensure
+	dep ensure -v
 
 .PHONY: dist
 dist:
