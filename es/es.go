@@ -11,6 +11,7 @@ import (
 	"github.com/dtan4/esnctl/es/v1"
 	"github.com/dtan4/esnctl/es/v2"
 	"github.com/dtan4/esnctl/es/v5"
+	"github.com/dtan4/esnctl/es/v6"
 	"github.com/pkg/errors"
 )
 
@@ -40,6 +41,13 @@ func New(clusterURL string, httpClient *http.Client) (Client, error) {
 		return client, nil
 	case "5":
 		client, err := v5.NewClient(clusterURL, httpClient)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
+		}
+
+		return client, nil
+	case "6":
+		client, err := v6.NewClient(clusterURL, httpClient)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to create Elasticsearch API client")
 		}
