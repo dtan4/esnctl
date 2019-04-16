@@ -57,6 +57,7 @@ func NewClient(clusterURL string, httpClient *http.Client) (*Client, error) {
 // DisableReallocation enables shard reallocation
 // Modifies cluster.routing.allocation.enable to "none"
 // https://www.elastic.co/guide/en/elasticsearch/reference/6.7/cluster-update-settings.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/6.7/shards-allocation.html
 func (c *Client) DisableReallocation() error {
 	endpoint := c.clusterEndpoint + "/_cluster/settings"
 
@@ -89,6 +90,7 @@ func (c *Client) DisableReallocation() error {
 // EnableReallocation enables shard reallocation
 // Modifies cluster.routing.allocation.enable to "all"
 // https://www.elastic.co/guide/en/elasticsearch/reference/6.7/cluster-update-settings.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/6.7/shards-allocation.html
 func (c *Client) EnableReallocation() error {
 	endpoint := c.clusterEndpoint + "/_cluster/settings"
 
