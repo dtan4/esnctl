@@ -70,7 +70,7 @@ export AWS_REGION=xx-yyyy-0
 List nodes
 
 ```bash
-$ esnctl add \
+$ esnctl list \
   --cluster-url http://elasticsearch.example.com
 ip-10-0-1-21.ap-northeast-1.compute.internal
 ip-10-0-1-22.ap-northeast-1.compute.internal
