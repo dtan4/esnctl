@@ -24,6 +24,8 @@ import:
   version: ~v3.0.68
 - package: gopkg.in/olivere/elastic.v5
   version: v5.0.34
+- package: gopkg.in/olivere/elastic.v6
+  version: v6.2.17
 testImport:
 - package: gopkg.in/h2non/gock.v1
   version: ~1.0.4

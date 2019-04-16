@@ -1,5 +1,5 @@
-hash: 97e90834b3a502f568b06d333c133ca8bd20f132d46388b08afb00056ea6d241
-updated: 2017-04-17T15:27:30.495556928+09:00
+hash: cf6cc96be276545ee42f6f9241a0d2b6c68f0dbb472aa3b01d86404b42a15d18
+updated: 2019-04-16T17:52:11.69754+09:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: 695fe24acaf9afe80b0ce261d4637f42ba0b4c7d
@@ -44,8 +44,19 @@ imports:
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jmespath/go-jmespath
   version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
+- name: github.com/mailru/easyjson
+  version: 1ea4449da9834f4d333f1cc461c374aea217d249
+  subpackages:
+  - buffer
+  - jlexer
+  - jwriter
+- name: github.com/olivere/elastic
+  version: 60d62e5b2d1c728d7cbbeb7ed9a284303ea4acd4
+  subpackages:
+  - config
+  - uritemplates
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: ba968bfe8b2f7e042a574c888954fccecfa385b4
 - name: github.com/spf13/cobra
   version: de09d9ce07d0d8a74442cfeaa91628cf9492cc23
 - name: github.com/spf13/pflag
@@ -56,12 +67,12 @@ imports:
   - context
   - context/ctxhttp
 - name: gopkg.in/olivere/elastic.v2
-  version: 54283cb278d855e562a3d20f6c5afdbe1decf25b
+  version: 2cd27b9ae892f6b4dd8dd6d73489797c99e9c6fa
   subpackages:
   - backoff
   - uritemplates
 - name: gopkg.in/olivere/elastic.v3
-  version: eb47340e05b08cae24208569de7240fecde96bd2
+  version: 9d2a5d8180014aa3e7ee50af6883baac66e2e646
   subpackages:
   - backoff
   - uritemplates
@@ -69,6 +80,10 @@ imports:
   version: 5f2bc471137b3a0574c35c3f33ee9e644e41c9f9
   subpackages:
   - uritemplates
+- name: gopkg.in/olivere/elastic.v6
+  version: 8a3f2cdf773521f77a2b9517d131c6cf28be6ca1
 testImports:
+- name: github.com/h2non/parth
+  version: b4df798d65426f8c8ab5ca5f9987aec5575d26c9
 - name: gopkg.in/h2non/gock.v1
-  version: 2897ffde93a71060ce86518f1e7317ec8433d2d6
+  version: ba88c4862a27596539531ce469478a91bc5a0511
